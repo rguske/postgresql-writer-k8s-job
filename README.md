@@ -71,3 +71,23 @@ kubectl create secret generic postgres-secret \
 2. Deploy the Job manifest
 
 `kubectl -n postgres-app apply -f postgresql-writer-job.yaml`
+
+## Check the written Data
+
+Check the data using the `psql` cli:
+
+```shell
+psql -U postgres -h 10.105.3.50 -p 5432 -d vmware -c 'SELECT * FROM myappdata'
+Password for user postgres:
+
+ value | data
+---------+---------
+ John    | Doe
+ Jane    | Smith
+ Alice   | Johnson
+(3 rows)
+```
+
+Alternatively, run a search query in pgadmin4:
+
+WIP
