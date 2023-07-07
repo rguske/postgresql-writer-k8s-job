@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-writer-job
+spec:
+  template:
+    metadata:
+      name: postgres-writer-pod
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: postgres-writer
+          image: registry.cloud-garage.net/rguske/postgres-app:1.1
+          env:
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: host
+            - name: POSTGRES_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: port
+            - name: POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: database
+            - name: TABLE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: table
+            - name: COLUMN_NAME1
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: column1
+            - name: COLUMN_NAME2
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: column2
+          command: ["python", "postgresql-app.py"]
+#      imagePullSecrets:
+#        - name:   # Optional: If your image is in a private registry
+  backoffLimit: 0  # Ensures that the job doesn't retry in case of failure
