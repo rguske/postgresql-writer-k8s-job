@@ -25,9 +25,23 @@ data = [
 # SQL statement to insert data into the table
 insert_query = f"INSERT INTO {table} ({column1}, {column2}) VALUES (%s, %s)"
 
-# Execute the INSERT statement for each row of data
+# Execute the INSERT statement as well as the SEARCH query for each row of data
 cur.executemany(insert_query, data)
 
+# Execute the PostgreSQL search query
+search_query = f"SELECT * FROM {table}"
+
+# Execute the PostgreSQL search query
+query = f"SELECT * FROM public.{table}"
+cur.execute(query)
+
+# Fetch all rows from the query result
+rows = cur.fetchall()
+
+# Print the rows to stdout
+for row in rows:
+    print(row)
+    
 # Commit the transaction and close the connection
 conn.commit()
 cur.close()

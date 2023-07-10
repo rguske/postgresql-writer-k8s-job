@@ -10,7 +10,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: postgres-writer
-          image: registry.cloud-garage.net/rguske/postgres-app:1.1
+          image: registry.cloud-garage.net/rguske/postgres-writer-app:1.0
           env:
             - name: POSTGRES_HOST
               valueFrom:
@@ -55,4 +55,5 @@ spec:
           command: ["python", "postgresql-app.py"]
 #      imagePullSecrets:
 #        - name:   # Optional: If your image is in a private registry
+          imagePullPolicy: Always
   backoffLimit: 0  # Ensures that the job doesn't retry in case of failure
