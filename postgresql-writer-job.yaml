@@ -37,17 +37,17 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: database
-            - name: TABLE_NAME
+            - name: TABLE
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: table
-            - name: COLUMN_NAME1
+            - name: COLUMN1
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: column1
-            - name: COLUMN_NAME2
+            - name: COLUMN2
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret

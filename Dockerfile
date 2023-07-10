@@ -16,8 +16,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
-# Expose the port your application listens on (if applicable)
-EXPOSE 80
-
 # Command to run your application
 CMD [ "python3", "postgresql-app.py" ]
