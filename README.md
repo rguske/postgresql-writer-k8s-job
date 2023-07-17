@@ -103,7 +103,7 @@ docker run -p 80:80 \
     -d dpage/pgadmin4:7.4
 ```
 
-![Alt text](image.png)
+![Alt text](image-1.png)
 
 Go to **Tools** and select **Query Tool**. Enter the following `search_query` and press the play button:
 
