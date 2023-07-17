@@ -1,28 +1,17 @@
 # PostgreSQL-Writer Application
 
-This repo contains a little python application which will write data into two PostgreSQL table columns. It can run as a Kubernetes Job.
+This repo contains a little python application which will write data into two PostgreSQL table columns. It'll run as a Kubernetes Job.
 
-## Run pgadmin4
+Supporting blog post - :memo: [vSphere with Tanzu Supervisor Services Part IV - Virtual Machine Service to support Hybrid Application Architectures](https://rguske.github.io/post/vsphere-with-tanzu-supervisor-services-part-iv-virtual-machine-service-to-support-hybrid-application-architectures/)
 
-```shell
-docker run -p 80:80 \
-    -e 'PGADMIN_DEFAULT_EMAIL=rguske@vmware.com' \
-    -e 'PGADMIN_DEFAULT_PASSWORD=VMware1!' \
-    -d dpage/pgadmin4:7.4
-```
-
-![Alt text](image.png)
-
-### (Optional) Create a Database
-
-I've created a new database called `vmware`. Make sure to specify the name of the DB accordingly for the Kubernetes secret.
+The container image is available on Docker Hub - :whale: [rguske/postgres-writer-app](https://hub.docker.com/r/rguske/postgres-writer-app/tags)
 
 ## Create the Container Image
 
 ```shell
-docker build -t rguske/postgres-app:1.0 .
+docker build -t rguske/postgres-writer-app:1.0 .
 
-[+] Building 1.4s (12/12) FINISHED                                                                                                                                                          
+[+] Building 1.4s (12/12) FINISHED
  => [internal] load build definition from Dockerfile                                                                                                                                   0.0s
  => => transferring dockerfile: 553B                                                                                                                                                   0.0s
  => [internal] load .dockerignore                                                                                                                                                      0.0s
@@ -40,14 +29,16 @@ docker build -t rguske/postgres-app:1.0 .
  => exporting to image                                                                                                                                                                 0.1s
  => => exporting layers                                                                                                                                                                0.1s
  => => writing image sha256:6bb4b4cfef77934dfbfb7119fd8195810074e0b9bc645c189ab3d15b5991a7c3                                                                                           0.0s
- => => naming to docker.io/rguske/postgres-app:1.0
+ => => naming to docker.io/rguske/postgres-writer-app:1.0
 ```
 
-## Create the Kubernetes Namespace
+## Run on Kubernetes
+
+### Create a Kubernetes Namespace
 
 `kubectl create ns postgres-app`
 
-## Create the Kubernetes Secret
+### Create the Kubernetes Secret
 
 ```shell
 kubectl create secret generic postgres-secret \
@@ -62,9 +53,9 @@ kubectl create secret generic postgres-secret \
   --namespace='postgres-app'
 ```
 
-## Create the Kubernetes Job
+### Deploy the Application as a Kubernetes Job
 
-1. Watch the execution in a seperate window (optional) 
+1. Watch the execution in a seperate window (optional)
 
 `watch kubectl -n postgres-app get job,pod`
 
@@ -72,12 +63,25 @@ kubectl create secret generic postgres-secret \
 
 `kubectl -n postgres-app apply -f postgresql-writer-job.yaml`
 
-## Check the written Data
+### Validating the written Data
 
-Check the data using the `psql` cli:
+We have three variants to use to validate that data was successfully written into the db table and columns.
+
+- 1. Using `kubectl`
+
+```shell
+kubectl -n postgres-app logs jobs/postgres-writer-job -f
+('John', 'Doe')
+('Jane', 'Smith')
+('Alice', 'Johnson')
+```
+
+- 2. Using `psql`:
+
 
 ```shell
 psql -U postgres -h 10.105.3.50 -p 5432 -d vmware -c 'SELECT * FROM myappdata'
+
 Password for user postgres:
 
  value | data
@@ -88,6 +92,19 @@ Password for user postgres:
 (3 rows)
 ```
 
-Alternatively, run a search query in pgadmin4:
+- 3. Using `pgAdmin`
 
-WIP
+Run pgadmin4 locally as conatiner.
+
+```shell
+docker run -p 80:80 \
+    -e 'PGADMIN_DEFAULT_EMAIL=rguske@vmware.com' \
+    -e 'PGADMIN_DEFAULT_PASSWORD=VMware1!' \
+    -d dpage/pgadmin4:7.4
+```
+
+![Alt text](image.png)
+
+Go to **Tools** and select **Query Tool**. Enter the following `search_query` and press the play button:
+
+`SELECT * FROM public.myappdata`
